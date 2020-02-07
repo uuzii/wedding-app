@@ -1,0 +1,199 @@
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<dom-module id="wedding-card">
+  <template>
+    <style>
+      :host {
+        display: block;
+        background-color: white;
+        padding: 20px;
+      }
+
+      div {
+        margin: 20px 0;
+        text-align: center;
+      }
+      
+      .name {
+        font-size: 100px;
+        font-family: 'Dancing Script', cursive;
+        margin: 10px;
+      }
+
+      .no-margin {
+        margin: 0;
+      }
+
+      .name.she {
+        position: relative;
+        top: -30px;
+      }
+
+      hr {
+        color: black;
+        opacity: 0.5;
+        width: 200px;
+        margin: 0 auto;
+      }
+
+      a {
+        color: #666666;
+        text-decoration: none;
+      }
+
+      .legend {
+        font-size: 16px;
+      }
+    </style>
+
+    <app-route route="{{route}}" pattern="/:guest" data="{{routeData}}"></app-route>
+
+    <div>
+      <div>
+        <p class="name">Uzi</p>
+        <p class="no-margin">y</p>
+        <p class="name she">Eva</p>
+      </div>
+
+
+      <div>
+        <p>Invitacion Para</p>
+        <h3>[[routeData.guest]]</h3>
+        <p>Nos sentimos muy agardecidos con Dios porque,
+          nos ha concedido la dicha de coinicidir y amarnos
+          mutuamente. Hoy, hemos decidido unir nuestras
+          vidas en matrimonio, y nos complace invitarlos a
+          nuestras bodas:</p>
+      </div>
+
+      <div>
+        <h2>Boda civil</h2>
+        <p>Domingo 15 de marzo de 2020 <br> 15:00 h<br>
+          <a href="https://goo.gl/maps/ajPbmce7vXZmCyH49">Colegio Vizacínas</a><br>
+          Vizcainas 21, Centro Histórico<br>
+          Ciudad de México</p>
+          <dom-if if="[[!civilCalendar]]">
+            <template>
+              <button on-click="_showCalendarCivil">Confirmar mi asistencia</button>
+              <p class="legend">(Podrás cancelarla en cualquier momento en este link)</p>
+            </template>
+          </dom-if>
+
+          <dom-if if="[[civilCalendar]]">
+            <template>
+              <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&amp;tmeid=N25oNTRkM2FwbDM4b24wcmwwcHFwZjBza2MgdXppYW5kZXZhQG0&amp;tmsrc=uziandeva%40gmail.com">
+                Agregar a mi calendario
+              </a>
+              <button on-click="_hideCalendarCivil">Cancelar mi asistencia</button>
+            </template>
+          </dom-if>
+      </div>
+
+      <div>
+        <h2>Boda por la iglesia</h2>
+        <p>Enlace matrimonial</p>
+        <p>Domingo 5 de abril de 2020 <br> 10:00 h <br>
+          <a href="https://goo.gl/maps/yS5cUCfEqYEwFny7A">La Luz del Mundo Piedra Bola</a>
+          <br> Zafiro 56b, Pedregal de la Villa <br>
+          Hermosillo, Sonora</p>
+        <hr>
+        <p>Celebración</p>
+        <p>Domingo 5 de abril de 2020 <br> 20:00 h <br>
+          <a href="https://goo.gl/maps/SxLgiEt8RbsWpGuZ8">Santa Clara </a>
+          <br> Blvd Santa Clara, Costa del Sol <br>
+          Hermosillo, Sonora</p>
+        
+        <dom-if if="[[!religiousCalendar]]">
+          <template>
+            <button on-click="_showCalendarReligious">Confirmar mi asistencia</button>
+            <p class="legend">(Podrás cancelarla en cualquier momento en este link)</p>
+          </template>
+        </dom-if>
+
+        <dom-if if="[[religiousCalendar]]">
+          <template>
+            <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&amp;tmeid=N25oNTRkM2FwbDM4b24wcmwwcHFwZjBza2MgdXppYW5kZXZhQG0&amp;tmsrc=uziandeva%40gmail.com">
+              Agregar a mi calendario
+            </a>
+            <button on-click="_hideCalendarReligious">Cancelar mi asistencia</button>
+          </template>
+        </dom-if>
+      </div>
+    </div>
+
+
+
+  </template>
+
+  <script>/**
+ * `wedding-card` Main card of the app
+ *
+ * @summary Class od card.
+ * @customElement
+ * @polymer
+ * @extends {Polymer.Element}
+ */
+class WeddingCard extends Polymer.Element {
+  /**
+   * String providing the tag name to register the element under.
+   */
+  static get is() {
+    return 'wedding-card';
+  }
+  /**
+   * Object describing property-related metadata used by Polymer features
+   */
+
+
+  static get properties() {
+    return {
+      route: Object,
+      civilCalendar: {
+        type: Boolean,
+        value: false
+      },
+      religiousCalendar: {
+        type: Boolean,
+        value: false
+      }
+    };
+  }
+  /**
+   * Instance of the element is created/upgraded. Use: initializing state,
+   * set up event listeners, create shadow dom.
+   * @constructor
+   */
+
+
+  constructor() {
+    super();
+  }
+  /**
+   * Use for one-time configuration of your component after local DOM is initialized. 
+   */
+
+
+  ready() {
+    super.ready();
+  }
+
+  _showCalendarCivil() {
+    this.set('civilCalendar', true);
+  }
+
+  _hideCalendarCivil() {
+    this.set('civilCalendar', false);
+  }
+
+  _showCalendarReligious() {
+    this.set('religiousCalendar', true);
+  }
+
+  _hideCalendarReligious() {
+    this.set('religiousCalendar', true);
+  }
+
+}
+
+window.customElements.define(WeddingCard.is, WeddingCard);</script>
+</dom-module>

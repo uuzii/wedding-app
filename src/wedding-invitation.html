@@ -1,0 +1,227 @@
+<link rel="import" href="wedding-utils.html">
+
+<dom-module id="wedding-invitation">
+  <template>
+    <style include="wedding-shared-styles">
+      :host {
+        display: block;
+      }
+
+      .and {
+        margin: 0 0 10px;
+      }
+
+      .link {
+        text-decoration: underline;
+        color: #000000;
+      }
+
+      .link:active {
+        color: #000000;
+      }
+
+      .subtitle {
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .head {
+        text-transform: none;
+        letter-spacing: 0;
+        font-size: 16px;
+        font-style: italic;
+      }
+    </style>
+
+    <div class="container">
+      <div class="center m-bottom-1">
+        <div class="logo">
+          <span class="logo_letter">U</span>
+          <span class="logo_letter">E</span>
+        </div>
+        <span class="logo_label">nuestra boda</span>
+      </div>
+
+      <p class="phrase m-bottom-1">"Como el lirio entre los espinos,
+        Así es mi amiga entre las doncellas.
+        Como el manzano entre los árboles silvestres,
+        Así es mi amado entre los jóvenes;
+        Bajo la sombra del deseado me senté,
+        Y su fruto fue dulce a mi paladar.
+        Me llevó a la casa del banquete,
+        Y su bandera sobre mí fue amor."</p>
+
+
+      <div class="center m-bottom-1">
+        <p class="names">UZI</p>
+        <p class="phrase and">y</p>
+        <p class="names">EVA</p>
+      </div>
+
+
+      <p class="body-text center m-bottom-1">Tenemos el honor de hacerles extensiva esta invitación
+        para que nos honren con su compañía en nuestras bodas
+      </p>
+
+      <template is="dom-if" if="[[civil]]">
+        <p class="body-text center subtitle">BODA CIVIL</p>
+        <p class="body-text center">marzo 15 2020 . 15 hrs<br>
+          <a href="https://goo.gl/maps/ajPbmce7vXZmCyH49" class="link">colegio de vizcainas</a>, centro
+          histórico <br> ciudad de méxico</p>
+        
+        <template is="dom-if" if="[[civilSpinnerAble]]">
+          <wedding-spinner></wedding-spinner>
+        </template>
+        
+        <template is="dom-if" if="[[!_computedCivilConfirmationView]]">
+          <button class="m-bottom-1" on-click="_confirmCivil">Confirmar asistencia</button>
+        </template>
+        
+        <template is="dom-if" if="[[_computedCivilConfirmationView]]">
+          <p class="center">¡Hemos recibido tu confirmación a la boda civil, [[guest.mainGuestName]]!</p>
+          <button>Agregar a mi calendario</button>
+          <button class="negative" on-click="_cancelCivil">Cancelar mi asistencia</button>
+        </template>
+      </template>
+
+      <template is="dom-if" if="[[civil]]">
+        <p class="body-text center subtitle">BODA POR LA IGLESIA</p>
+        <p class="body-text center"> <span class="head">Enlace matrimonial</span><br>
+          abril 5 2020 . 10 hrs <br> La Luz del Mundo
+          <a href="https://goo.gl/maps/DYmaZDHHqwuzndgR9" class="link">Piedra Bola</a><br>
+          Hermosillo Sonora</p>
+        <hr class="divider">
+        <p class="body-text center"> <span class="head">Celebración</span><br>
+          abril 5 2020 . 20 hrs <br> Eventos <a href="https://goo.gl/maps/SxLgiEt8RbsWpGuZ8" class="link">Santa Clara</a><br>
+          Hermosillo Sonora </p>
+
+        
+        <template is="dom-if" if="[[religiousSpinnerAble]]">
+          <wedding-spinner></wedding-spinner>
+        </template>
+        
+        <template is="dom-if" if="[[!_computedReligiousConfirmationView]]">
+          <button class="m-bottom-1" on-click="_confirmReligious">Confirmar asistencia</button>
+        </template>
+        
+        <template is="dom-if" if="[[_computedReligiousConfirmationView]]">
+          <p class="center">¡Hemos recibido tu confirmación a la boda por la iglesia, [[guest.mainGuestName]]!</p>
+          <button>Agregar a mi calendario</button>
+          <button class="negative" on-click="_cancelReligious">Cancelar mi asistencia</button>
+        </template>
+      </template>
+    </div>
+
+
+
+  </template>
+
+  <script>
+    /**
+     * `wedding-card` Main card of the app
+     *
+     * @summary Class fo invitation.
+     * @customElement
+     * @polymer
+     * @extends {Polymer.Element}
+     */
+    class WeddingInvitation extends WeddingUtils(Polymer.Element) {
+      /**
+       * String providing the tag name to register the element under.
+       */
+      static get is() {
+        return 'wedding-invitation';
+      }
+
+      /**
+       * Object describing property-related metadata used by Polymer features
+       */
+      static get properties() {
+        return {
+          civil: {
+            type: Boolean,
+            value: true
+          },
+
+          guest: {
+            type: Object
+          },
+
+          civilSpinnerAble: {
+            type: Boolean,
+            value: false
+          },
+
+          civilConfirmationView: {
+            type: Boolean,
+            value: false
+          },
+
+          _computedCivilConfirmationView: {
+            type: Boolean,
+            computed: '_computeConfirmationView(guest.confirmations.civil, civilConfirmationView)'
+          },
+
+          religiousSpinnerAble: {
+            type: Boolean,
+            value: false
+          },
+
+          religiousConfirmationView: {
+            type: Boolean,
+            value: false
+          },
+
+          _computedReligiousConfirmationView: {
+            type: Boolean,
+            computed: '_computeConfirmationView(guest.confirmations.religious, religiousConfirmationView)'
+          }
+        };
+      }
+
+      /**
+       * Instance of the element is created/upgraded. Use: initializing state,
+       * set up event listeners, create shadow dom.
+       * @constructor
+       */
+      constructor() {
+        super();
+      }
+
+      /**
+       * Use for one-time configuration of your component after local DOM is initialized. 
+       */
+      ready() {
+        super.ready();
+
+      }
+
+      _confirmCivil() {
+        this.set('civilSpinnerAble', true)
+        this.eventDispatcher('invitation-confirm-civil', { confirmation: true })
+      }
+
+      _cancelCivil() {
+        this.set('civilSpinnerAble', true)
+        this.eventDispatcher('invitation-cancel-civil', { confirmation: false })
+      }
+
+      _confirmReligious() {
+        this.set('religiousSpinnerAble', true)
+        this.eventDispatcher('invitation-confirm-religious', { confirmation: true })
+      }
+
+      _cancelReligious() {
+        this.set('religiousSpinnerAble', true)
+        this.eventDispatcher('invitation-cancel-religious', { confirmation: false })
+      }
+
+      _computeConfirmationView(origin, generated) {
+        return origin || generated
+      }
+
+    }
+
+    window.customElements.define(WeddingInvitation.is, WeddingInvitation);
+  </script>
+</dom-module>

@@ -1,0 +1,83 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+
+<dom-module id="wedding-dm">
+  <template>
+    <style>
+      :host {
+        display: block
+      }
+    </style>
+
+    <!-- <firebase-app
+      auth-domain="uziandeva-e22b4.firebaseapp.com"
+      database-url="https://uziandeva-e22b4.firebaseio.com/"
+      api-key="AIzaSyBkp8rTy-ZfcdEFSq_Q4VANKnS82gWcIqA">
+    </firebase-app>
+
+    <firebase-query
+      id="query"
+      app-name="wedding"
+      path="/01"
+      data="{{data}}">
+    </firebase-query> -->
+
+  </template>
+
+  <script>/**
+ * `wedding-dm` Description
+ *
+ * @summary ShortDescription.
+ * @customElement
+ * @polymer
+ * @extends {Polymer.Element}
+ */
+class WeddingDm extends Polymer.Element {
+  /**
+   * String providing the tag name to register the element under.
+   */
+  static get is() {
+    return 'wedding-dm';
+  }
+  /**
+   * Object describing property-related metadata used by Polymer features
+   */
+
+
+  static get properties() {
+    return {
+      data: {
+        type: Object,
+        observer: '_datacharged'
+      }
+    };
+  }
+  /**
+   * Instance of the element is created/upgraded. Use: initializing state,
+   * set up event listeners, create shadow dom.
+   * @constructor
+   */
+
+
+  constructor() {
+    super();
+  }
+
+  _datacharged(oldv, newv) {
+    console.log('old', oldv);
+    console.log('new', newv);
+  }
+  /**
+   * Use for one-time configuration of your component after local DOM is initialized. 
+   */
+
+
+  ready() {
+    super.ready();
+  }
+
+}
+
+window.customElements.define(WeddingDm.is, WeddingDm);</script>
+</dom-module>

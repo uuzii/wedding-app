@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uzi y Eva</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: old-standard, serif;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <wedding-spinner id="loader"></wedding-spinner>
+  <wedding-app id="app" class="hidden"></wedding-app>
+
+
+  <script src="bower_components/webcomponents/webcomponents-loader.js"></script>
+  <link rel="import" href="src/wedding-app.html">
+  <link rel="import" href="src/wedding-spinner.html">
+  <link rel="stylesheet" href="https://use.typekit.net/sru8vru.css">
+  <script>
+    document.querySelector('#app').addEventListener('dm-guest-data-loaded', () => {
+      document.querySelector('wedding-app').classList.remove('hidden')
+      document.querySelector('#loader').remove();
+    })
+  </script>
+</body>
+
+</html>

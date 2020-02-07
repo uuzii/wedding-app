@@ -1,0 +1,26 @@
+<dom-module id="wedding-utils">
+  <script>
+    /**
+     * `wedding-utils` Wedding re usable methods
+     * @summary.
+     * @customElement
+     * @polymer
+     * @extends {superClass}
+     */
+    WeddingUtils = (superClass) => class extends superClass {
+      /**
+       * @desc dispatchs a generic event
+       * @param {String} eventName
+       * @param {Object} detail
+       * @event 'eventName'
+       */
+      eventDispatcher(eventName, detail) {
+        this.dispatchEvent(new CustomEvent(eventName, {
+          detail: detail,
+          bubbles: true,
+          composed: true
+        }));
+      }
+    }
+  </script>
+</dom-module>

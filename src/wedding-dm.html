@@ -1,0 +1,130 @@
+<link rel="import" href="wedding-utils.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app-script.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-database-script.html">
+
+<dom-module id="wedding-dm">
+  <template>
+    <style>
+      :host {
+        display: block
+      }
+    </style>
+
+  </template>
+
+  <script>
+    /**
+     * `wedding-dm` Description
+     *
+     * @summary ShortDescription.
+     * @customElement
+     * @polymer
+     * @extends {Polymer.Element}
+     */
+    class WeddingDm extends WeddingUtils(Polymer.Element) {
+      /**
+       * String providing the tag name to register the element under.
+       */
+      static get is() {
+        return 'wedding-dm';
+      }
+
+      /**
+       * Object describing property-related metadata used by Polymer features
+       */
+      static get properties() {
+        return {
+          guest: {
+            type: Object,
+            observer: '_onGuestChange'
+          }
+        };
+      }
+
+      /**
+       * Instance of the element is created/upgraded. Use: initializing state,
+       * set up event listeners, create shadow dom.
+       * @constructor
+       */
+      constructor() {
+        super();
+      }
+
+      /**
+       * Use for one-time configuration of your component after local DOM is initialized. 
+       */
+      ready() {
+        super.ready()
+        this.initFirebaseApp()
+      }
+
+      initFirebaseApp() {
+        const CONFIG = {
+          apiKey: "AIzaSyBkp8rTy-ZfcdEFSq_Q4VANKnS82gWcIqA",
+          authDomain: "uziandeva-e22b4.firebaseapp.com",
+          databaseURL: "https://uziandeva-e22b4.firebaseio.com",
+          projectId: "uziandeva-e22b4",
+          storageBucket: "uziandeva-e22b4.appspot.com",
+          messagingSenderId: "65428514525",
+          appId: "1:65428514525:web:c7eafd556d315b30eedd34"
+        }
+
+        firebase.initializeApp(CONFIG)
+      }
+
+      _onGuestChange(newValue) {
+        if (newValue && newValue.path) {
+          this.requestApiData(newValue.path)
+        }
+      }
+
+      requestApiData(guest) {
+        let guestsList = firebase.database().ref('guests' + guest)
+        guestsList.once('value').then(snapshot =>
+          this.eventDispatcher.call(this, 'dm-guest-data-loaded', snapshot.val())
+        )
+      }
+
+      changeConfirmation(data) {
+        let updates = {}
+        updates[`guests/${data.id}/confirmations/${data.type}`] = data.confirmation
+        updates[`confirmations/${data.id}/${data.type}`] = data.confirmation
+
+        let action = data.confirmation ? 'confirmation' : 'cancellation'
+
+        firebase.database().ref().update(updates, error => {
+          if (error) {
+            this.eventDispatcher(`dm-${data.type}-${action}-error`)
+          } else {
+            this.eventDispatcher(`dm-${data.type}-${action}-saved`)
+          }
+        })
+      }
+
+      requestAddGuest(payload) {
+        let guestKey = firebase.database().ref().child('guests').push().key
+        let confirmationsKey = firebase.database().ref().child('confirmations').push().key
+        let updates = {}
+        updates[`guests/${guestKey}`] = payload
+        updates[`confirmations/${confirmationsKey}`] = payload        
+
+        firebase.database().ref().update(updates, error => {
+          if (error) {
+            this.eventDispatcher(`dm-added-user-error`)
+          } else {
+            this.eventDispatcher(`dm-added-user-successful`)
+          }
+        })
+      }
+
+      requestGuestsList() {
+        let guestsList = firebase.database().ref('guests/')
+        guestsList.once('value').then(snapshot =>
+          this.eventDispatcher.call(this, 'dm-guests-data-loaded', snapshot.val())
+        )
+      }
+    }
+
+    window.customElements.define(WeddingDm.is, WeddingDm);
+  </script>
+</dom-module>

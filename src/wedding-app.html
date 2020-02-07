@@ -1,0 +1,185 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="wedding-invitation.html">
+<link rel="import" href="wedding-home.html">
+<link rel="import" href="wedding-dashboard.html">
+<link rel="import" href="wedding-messages.html">
+<link rel="import" href="wedding-dm.html">
+<link rel="import" href="wedding-shared-styles.html">
+
+<dom-module id="wedding-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      main {
+        padding: 20px;
+      }
+    </style>
+
+    <wedding-dm id="dm" guest="[[subroute]]"></wedding-dm>
+
+    <app-location route="{{route}}" use-hash-as-path></app-location>
+    <app-route route="{{route}}" pattern="/:view" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+    <main>
+      <iron-pages selected="[[routeData.view]]" attr-for-selected="name">
+        <wedding-home name="inicio" guest="[[guestData]]"></wedding-home>
+        <wedding-invitation name="invitacion" id="inv" guest="[[guestData]]"></wedding-invitation>
+        <wedding-dashboard name="panel" id="panel"></wedding-dashboard>
+        <wedding-messages name="felicitacion" guest="[[guestData]]"></wedding-messages>
+      </iron-pages>
+    </main>
+  </template>
+
+  <script>
+    /**
+     * `wedding-app` App Core
+     *
+     * @summary Main class of core app.
+     * @customElement
+     * @polymer
+     * @extends {Polymer.Element}
+     */
+    class WeddingApp extends Polymer.Element {
+      /**
+       * String providing the tag name to register the element under.
+       */
+      static get is() {
+        return 'wedding-app';
+      }
+
+      /**
+       * Object describing property-related metadata used by Polymer features
+       */
+      static get properties() {
+        return {
+          route: Object,
+          routeData: Object,
+          subroute: Object,
+          guestData: Object
+        };
+      }
+
+      /**
+       * Instance of the element is created/upgraded. Use: initializing state,
+       * set up event listeners, create shadow dom.
+       * @constructor
+       */
+      constructor() {
+        super();
+
+        this.addEventListener('home-go-to-invitation', () => {
+          this.set('routeData.view', 'invitacion' + this.subroute.path)
+        })
+
+        this.addEventListener('dm-guest-data-loaded', e => {
+          this.set('guestData', e.detail)
+        })
+
+        this.addEventListener('home-go-to-messages', () => {
+          this.set('routeData.view', 'felicitacion' + this.subroute.path)
+        })
+
+        // CIVIL methods
+
+        this.addEventListener('invitation-confirm-civil', e => {
+          this.shadowRoot.querySelector('#dm')
+          .changeConfirmation({
+            type: 'civil',
+            id: this.subroute.path,
+            confirmation: e.detail.confirmation
+          })
+        })
+
+        this.addEventListener('invitation-cancel-civil', e => {
+          this.shadowRoot.querySelector('#dm')
+          .changeConfirmation({
+            type: 'civil',
+            id: this.subroute.path,
+            confirmation: e.detail.confirmation
+          })
+        })
+
+        this.addEventListener('dm-civil-confirmation-saved', () => {
+          this.shadowRoot.querySelector('#inv').civilConfirmationView = true
+          this.shadowRoot.querySelector('#inv').civilSpinnerAble = false
+        })
+
+        this.addEventListener('dm-civil-cancellation-saved', () => {
+          this.shadowRoot.querySelector('#inv').civilConfirmationView = false
+          this.shadowRoot.querySelector('#inv').civilSpinnerAble = false
+        })
+
+        // RELIGIOUS methods
+
+        this.addEventListener('invitation-confirm-religious', e => {
+          this.shadowRoot.querySelector('#dm')
+          .changeConfirmation({
+            type: 'religious',
+            id: this.subroute.path,
+            confirmation: e.detail.confirmation
+          })
+        })
+
+        this.addEventListener('invitation-cancel-religious', e => {
+          this.shadowRoot.querySelector('#dm')
+          .changeConfirmation({
+            type: 'religious',
+            id: this.subroute.path,
+            confirmation: e.detail.confirmation
+          })
+        })
+
+        this.addEventListener('dm-religious-confirmation-saved', () => {
+          this.shadowRoot.querySelector('#inv').religiousConfirmationView = true
+          this.shadowRoot.querySelector('#inv').religiousSpinnerAble = false
+        })
+
+        this.addEventListener('dm-religious-cancellation-saved', () => {
+          this.shadowRoot.querySelector('#inv').religiousConfirmationView = false
+          this.shadowRoot.querySelector('#inv').religiousSpinnerAble = false
+        })
+
+        // ADD guest
+
+        this.addEventListener('dashboard-request-add-guest', e => {
+          this.shadowRoot.querySelector('#dm').requestAddGuest(e.detail)
+        })
+
+        this.addEventListener('dm-added-user-successful', () => {
+          this.shadowRoot.querySelector('#panel').showSuccessGuestAdded()
+        })
+
+        this.addEventListener('dm-added-user-error', () => {
+          console.log('Data error');
+        })
+
+        // DASHBOARD METHODS
+
+        this.addEventListener('dashboard-request-guests-list', () => {
+          this.shadowRoot.querySelector('#dm').requestGuestsList()
+        })
+
+        this.addEventListener('dm-guests-data-loaded', e => {
+          this.shadowRoot.querySelector('#panel').fetchedList = e.detail
+        })
+      }
+
+      /**
+       * Use for one-time configuration of your component after local DOM is initialized. 
+       */
+      ready() {
+        super.ready();
+        //this.set('routeData')
+      }
+    }
+
+    window.customElements.define(WeddingApp.is, WeddingApp);
+  </script>
+</dom-module>

@@ -1,0 +1,330 @@
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="wedding-utils.html">
+
+<dom-module id="wedding-dashboard">
+  <template>
+    <style include="wedding-shared-styles">
+      :host {
+        display: block;
+      }
+
+      .header {
+        display: flex;
+        align-items: center
+      }
+
+      .button {
+        color: black;
+        margin-right: 5px;
+      }
+
+      .item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        align-items: center;
+      }
+
+      hr {
+        margin: 0;
+      }
+
+      .boxes {
+        padding: 16px 0;
+        margin-bottom: 10px;
+      }
+
+      paper-checkbox {
+        margin-right: 16px;
+      }
+    </style>
+
+    <div class="container">
+      <div class="header">
+        <template is="dom-if" if="[[!_computedArrowBack]]">
+          <paper-icon-button
+            on-click="_goToPanel"
+            class="button"
+            icon="icons:arrow-back">
+          </paper-icon-button>
+        </template>
+        <h1>Panel</h1>
+      </div>
+
+      <iron-pages selected="[[option]]" attr-for-selected="name">
+        <!-- list -->
+        <div name="menu">
+          <template is="dom-repeat" items="[[menu]]" as="option">
+            <template is="dom-if" if="[[_validateFirstIndex(index)]]">
+              <hr>
+            </template>
+            <div class="item">
+              <div>[[option.name]]</div>
+              <div>
+                [[option.number]]
+                <paper-icon-button
+                  icon="[[_validateLastButton(index)]]"
+                  on-click="_resolveAction"
+                  data-query$="[[option.query]]"></paper-icon-button>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- guests list -->
+        <div name="list">
+          <template is="dom-repeat" items="[[filteredList]]" as="guest">
+            <template is="dom-if" if="[[_validateFirstIndex(index)]]">
+              <hr>
+            </template>
+            <div class="item">
+              <div>[[guest.mainGuestName]]</div>
+              <div>
+                <paper-icon-button
+                  icon="icons:chevron-right"
+                  on-click="_showContactDetail"
+                  data-index$="[[index]]"></paper-icon-button>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- guest detail -->
+        <div name="detail">
+          <h2 class="">[[currentGuest.mainGuestName]]</h2>
+          <p>Acompañantes: [[currentGuest.companions]]</p>
+          <p>Invitado civil: [[currentGuest.civil]]</p>
+          <p>Confirmado civil: [[currentGuest.confirmations.civil]]</p>
+          <p>Invitado iglesia: [[currentGuest.religious]]</p>
+          <p>Confirmado iglesia: [[currentGuest.confirmations.religious]]</p>
+          <p>Mensaje: [[currentGuest.inscription]]</p>
+        </div>
+
+        <!-- add guest -->
+        <div name="add">
+          <h2>Agregar invitado</h2>
+          <paper-input label="Invitado principal" value="{{formData.mainGuestName}}"></paper-input>
+          <paper-input label="Acompañantes" value="{{formData.companions}}"></paper-input>
+          <paper-textarea label="Mensaje" value="{{formData.inscription}}"></paper-textarea>
+          <div class="boxes">
+            <paper-checkbox checked="{{formData.civil}}">Civil</paper-checkbox>
+            <paper-checkbox checked="{{formData.religious}}">Iglesia</paper-checkbox>
+          </div>
+          <button on-click="_requestAddGuest">Agregar invitado</button>
+          <template is="dom-if" if="[[notifySuccess]]">
+            <p class="center">¡Datos guardados!</p>
+          </template>
+        </div>
+      </iron-pages>
+
+
+    </div>
+
+  </template>
+
+  <script>
+    /**
+     * `wedding-dashboard` Description
+     *
+     * @summary ShortDescription.
+     * @customElement
+     * @polymer
+     * @extends {Polymer.Element}
+     */
+    class WeddingDashboard extends WeddingUtils(Polymer.Element) {
+      /**
+       * String providing the tag name to register the element under.
+       */
+      static get is() {
+        return 'wedding-dashboard';
+      }
+
+      /**
+       * Object describing property-related metadata used by Polymer features
+       */
+      static get properties() {
+        return {
+          option: {
+            type: String,
+            value: 'menu'
+          },
+
+          _computedArrowBack: {
+            type: Boolean,
+            computed: '_computeArrowBack(option)'
+          },
+
+          menu: {
+            type: Array,
+            computed: '_computeMenu(statics)'
+          },
+
+          formData: {
+            type: Object,
+            value: {
+              civil: false,
+              religious: false,
+              confirmations: {
+                civil: false,
+                religious: false
+              }
+            }
+          },
+
+          notifySuccess: {
+            type: Boolean,
+            value: false
+          },
+
+          statics: {
+            type: Object,
+            value: {
+              totalCivilGuests: 100,
+              civilConfirmed: 80,
+              civilNotConfirmed: 20,
+              totalReligiousGuests: 90,
+              religiousConfirmed: 70,
+              religiousNotConfirmed: 20,
+              messages: 200
+            }
+          },
+
+          fetchedList: Object,
+
+          query: {
+            type: String,
+            value: 'cc'
+          },
+
+          currentList: {
+            type: Array,
+            computed: '_computeCurrentList(fetchedList)'
+          },
+
+          filteredList: Array,
+
+          currentGuest: Object
+        };
+      }
+
+      /**
+       * Instance of the element is created/upgraded. Use: initializing state,
+       * set up event listeners, create shadow dom.
+       * @constructor
+       */
+      constructor() {
+        super();
+      }
+
+      /**
+       * Use for one-time configuration of your component after local DOM is initialized. 
+       */
+      ready() {
+        super.ready();
+        this.eventDispatcher('dashboard-request-guests-list')
+      }
+
+      _goToPanel() {
+        this.set('option', 'menu')
+      }
+
+      _computeArrowBack(option) {
+        return option === 'menu'
+      }
+
+      _computeMenu(statics) {
+        return [
+          { name: 'Invitados totales civil', number: statics.totalCivilGuests, query: 'tc' },
+          { name: 'Confirmados civil', number: statics.civilConfirmed, query: 'cc' },
+          { name: 'Sin confirmar civil', number: statics.civilNotConfirmed, query: 'nc' },
+          { name: 'Invitados totales iglesia', number: statics.totalReligiousGuests, query: 'tr' },
+          { name: 'Confirmados iglesia', number: statics.religiousConfirmed, query: 'cr' },
+          { name: 'Sin confirmar iglesia', number: statics.religiousNotConfirmed, query: 'nr' },
+          { name: 'Felicitaciones', number: statics.messages, query: 'messages' },
+          { name: 'Agregar invitado', number: '', query: 'add' }
+        ]
+      }
+
+      _resolveAction(e) {
+        let query = e.target.getAttribute('data-query')
+        if (query === 'messages') {
+          this.set('option', 'list')
+        } else if (query === 'add') {
+          this.set('option', 'add')
+        } else {
+          this._showListView(query)
+        }
+      }
+
+      _validateFirstIndex(index) {
+        return index !== 0
+      }
+
+      _validateLastButton(index) {
+        return index === 7 ? 'icons:add' : 'icons:chevron-right'
+      }
+
+      _computeCurrentList(list) {
+        return Object.values(list)
+      }
+
+      _showListView(query) {
+        switch (query) {
+          case 'tc':
+            this.set('filteredList', this.currentList.filter(item => item.civil))
+            break;
+          case 'cc':
+            this.set('filteredList', this.currentList.filter(item => item.confirmations.civil))
+            break;
+          case 'nc':
+            this.set('filteredList', this.currentList.filter(item => !item.confirmations.civil))
+            break;
+          case 'tr':
+            this.set('filteredList', this.currentList.filter(item => item.religious))
+            break;
+          case 'cr':
+            this.set('filteredList', this.currentList.filter(item => item.confirmations.religious))
+            break;
+          case 'nr':
+            this.set('filteredList', this.currentList.filter(item => !item.confirmations.religious))
+            break;
+          default:
+            break;
+        }
+        this.set('option', 'list')
+      }
+
+      _requestAddGuest() {
+        this.eventDispatcher('dashboard-request-add-guest', this.formData)
+      }
+
+      showSuccessGuestAdded() {
+        this.set('formData', {
+          civil: false,
+          religious: false,
+          confirmations: {
+            civil: false,
+            religious: false
+          }
+        })
+        this.set('notifySuccess', true)
+        let timer = setTimeout(() => {
+          this.set('notifySuccess', false)
+        }, 2000)
+      }
+
+      _showContactDetail(e) {
+        this.set('currentGuest', this.filteredList[e.target.getAttribute('data-index')])
+        this.set('option', 'detail')
+      }
+
+    }
+
+    window.customElements.define(WeddingDashboard.is, WeddingDashboard);
+  </script>
+</dom-module>

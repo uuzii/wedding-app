@@ -1,0 +1,76 @@
+<dom-module id="wedding-messages">
+  <template>
+    <style include="wedding-shared-styles">
+      :host {
+        display: block
+      }
+    </style>
+
+    <div class="container">
+      <div class="center m-bottom-1">
+        <div class="logo">
+          <span class="logo_letter">U</span>
+          <span class="logo_letter">E</span>
+        </div>
+        <span class="logo_label">nuestra boda</span>
+      </div>
+
+      <div>
+        <p>Escribe una felicitación y la recibiremos para proyectarla durante la boda</p>
+        <textarea name="" id="" cols="30" rows="10"></textarea>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    /**
+     * `wedding-messages` Messages view
+     *
+     * @summary.
+     * @customElement
+     * @polymer
+     * @extends {Polymer.Element}
+     */
+    class WeddingMessages extends Polymer.Element {
+      /**
+       * String providing the tag name to register the element under.
+       */
+      static get is() {
+        return 'wedding-messages';
+      }
+
+      /**
+       * Object describing property-related metadata used by Polymer features
+       */
+      static get properties() {
+        return {
+
+        };
+      }
+
+      /**
+       * Instance of the element is created/upgraded. Use: initializing state,
+       * set up event listeners, create shadow dom.
+       * @constructor
+       */
+      constructor() {
+        super();
+      }
+
+      /**
+       * Use for one-time configuration of your component after local DOM is initialized. 
+       */
+      ready() {
+        super.ready();
+
+        Polymer.RenderStatus.afterNextRender(this, function () {
+
+        });
+      }
+
+    }
+
+    window.customElements.define(WeddingMessages.is, WeddingMessages);
+  </script>
+</dom-module>

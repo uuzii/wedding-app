@@ -1,0 +1,98 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="wedding-card.html">
+<link rel="import" href="wedding-dashboard.html">
+<link rel="import" href="wedding-dm.html">
+
+<dom-module id="wedding-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+        background-color: #e3e3e3;
+        font-size: 22px;
+      }
+
+
+      wedding-card {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+    </style>
+
+    <app-location route="{{route}}" use-hash-as-path=""></app-location>
+    <app-route route="{{route}}" pattern="/:view" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+    <wedding-dm></wedding-dm>
+
+    <header></header>
+
+    <main>
+      <iron-pages selected="[[routeData.view]]" attr-for-selected="name">
+        <wedding-card name="invitacion" route="{{subroute}}"></wedding-card>
+        <wedding-dashboard name="panel"></wedding-dashboard>
+      </iron-pages>
+    </main>
+
+  </template>
+
+  <script>/**
+ * `wedding-app` App Core
+ *
+ * @summary Main class of core app.
+ * @customElement
+ * @polymer
+ * @extends {Polymer.Element}
+ */
+class WeddingApp extends Polymer.Element {
+  /**
+   * String providing the tag name to register the element under.
+   */
+  static get is() {
+    return 'wedding-app';
+  }
+  /**
+   * Object describing property-related metadata used by Polymer features
+   */
+
+
+  static get properties() {
+    return {
+      route: Object,
+      routeData: Object,
+      subroute: Object,
+      guest: {
+        type: Object,
+        value: {
+          name: 'Hermano Noé Montaño y Familia',
+          message: 'nos ha brindado consejos útiles para nuestro matrimonio'
+        }
+      }
+    };
+  }
+  /**
+   * Instance of the element is created/upgraded. Use: initializing state,
+   * set up event listeners, create shadow dom.
+   * @constructor
+   */
+
+
+  constructor() {
+    super();
+  }
+  /**
+   * Use for one-time configuration of your component after local DOM is initialized. 
+   */
+
+
+  ready() {
+    super.ready(); //this.set('route.path', 'invitacion/abc')
+  }
+
+}
+
+window.customElements.define(WeddingApp.is, WeddingApp);</script>
+</dom-module>

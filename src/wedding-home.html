@@ -1,0 +1,79 @@
+<link rel="import" href="wedding-utils.html">
+
+<dom-module id="wedding-home">
+  <template>
+    <style include="wedding-shared-styles">
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="container">
+      <div class="center m-bottom-1">
+        <div class="logo">
+          <span class="logo_letter">U</span>
+          <span class="logo_letter">E</span>
+        </div>
+        <span class="logo_label">nuestra boda</span>
+      </div>
+
+      <div class="m-bottom-2">
+        <p class="body-text">[[_validateGreet(guest.lldm)]], [[guest.mainGuestName]]</p>
+        <p class="body-text">Hoy, por este medio tenemos la dicha de compartir contigo [[guest.companions]],
+          una invitación para participar de la alegria de unir nuestras vidas en matrimonio,
+          [[guest.inscription]].
+        </p>
+      </div>
+
+      <div>
+        <button on-click="_seeInvitation">Ver Invitación</button>
+        <br>
+        <button on-click="_writeMessage">Escribir una felicitación</button>
+      </div>
+
+    </div>
+
+  </template>
+
+  <script>
+    /**
+     * `wedding-home` Home view
+     *
+     * @summary.
+     * @customElement
+     * @polymer
+     * @extends {Polymer.Element}
+     */
+    class WeddingHome extends WeddingUtils(Polymer.Element) {
+      /**
+       * String providing the tag name to register the element under.
+       */
+      static get is() {
+        return 'wedding-home';
+      }
+
+      /**
+       * Object describing property-related metadata used by Polymer features
+       */
+      static get properties() {
+        return {
+          guest: Object
+        };
+      }
+
+      _validateGreet(lldmMember) {
+        return lldmMember ? 'La Paz de Dios' : 'Hola'
+      }
+
+      _seeInvitation() {
+        this.eventDispatcher('home-go-to-invitation')
+      }
+
+      _writeMessage() {
+        this.eventDispatcher('home-go-to-messages')
+      }
+    }
+
+    window.customElements.define(WeddingHome.is, WeddingHome);
+  </script>
+</dom-module>
